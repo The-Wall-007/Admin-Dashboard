@@ -1,8 +1,7 @@
-import React from "react";
 import Layout from "@/app/Components/layout";
 
 const EvaluationsPage = () => {
-  return <Layout>Conferences Page</Layout>;
+  return <Layout>Evaluations Page</Layout>;
 };
 
 export default EvaluationsPage;

@@ -1,11 +1,12 @@
 "use client";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
 
   return (
     <main>
-      <p onClick={() => router.push("/Dashboard")}>Sign In</p>
+      <Link href="/Dashboard">Go to drawer menu</Link>
     </main>
   );
 }

@@ -6,12 +6,6 @@ import {
   Drawer as MuiDrawer,
   AppBar as MuiAppBar,
   Toolbar,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Collapse,
   Divider,
   IconButton,
   Typography,
@@ -20,8 +14,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MailIcon from "@mui/icons-material/Mail";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import DashboardCustomizeIcon from "@mui/icons-material/DashboardCustomize";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
@@ -30,6 +22,18 @@ import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
 import QuizIcon from "@mui/icons-material/Quiz";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
+import AdminLogo from "./Admin.jpg";
+
+import NavigationListItem from "./DrawerMenuListItems/NavigationListItem";
+import CollapsibleListItem from "./DrawerMenuListItems/CollapsibleListItem";
+
+interface AppBarProps {
+  open?: boolean;
+}
+interface LayoutProps {
+  children: React.ReactNode;
+}
 
 const drawerWidth = 240;
 
@@ -59,13 +63,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   alignItems: "center",
   justifyContent: "flex-end",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
-
-interface AppBarProps {
-  open?: boolean;
-}
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -102,104 +101,17 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-interface CollapsibleSectionProps {
-  open: boolean;
-  isCollapseOpen: boolean;
-  handleCollapse: () => void;
-  sectionTitle: string;
-  subItems: string[];
-  icons: React.ReactNode[];
-  active: boolean;
-  onClick: () => void;
-}
-
-const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
-  open,
-  isCollapseOpen,
-  handleCollapse,
-  sectionTitle,
-  subItems,
-  icons,
-  active,
-  onClick,
-}) => (
-  <>
-    <ListItem disablePadding onClick={handleCollapse}>
-      <ListItemButton
-        sx={{
-          minHeight: 48,
-          justifyContent: open ? "initial" : "center",
-          px: 2.5,
-          bgcolor: active ? "primary.main" : "primary.secondary",
-        }}
-        onClick={onClick}
-      >
-        <ListItemIcon
-          sx={{
-            minWidth: 0,
-            mr: open ? 3 : "auto",
-            justifyContent: "center",
-          }}
-          style={{ color: active ? "white" : "black" }}
-        >
-          {icons[0]} {/* Use the icon for the section */}
-        </ListItemIcon>
-        <ListItemText
-          primary={sectionTitle}
-          sx={{ opacity: open ? 1 : 0, color: active ? "white" : "black" }}
-        />
-        {open &&
-          (isCollapseOpen ? (
-            <ExpandLessIcon style={{ color: active ? "white" : "black" }} />
-          ) : (
-            <ExpandMoreIcon style={{ color: active ? "white" : "black" }} />
-          ))}
-      </ListItemButton>
-    </ListItem>
-    <Collapse in={isCollapseOpen} timeout="auto" unmountOnExit>
-      <List sx={{ pl: 2 }}>
-        {subItems.map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: open ? "initial" : "center",
-                px: 2.5,
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: open ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
-                {icons[index + 1]} {/* Use the icon for the subitem */}
-              </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Collapse>
-    <Divider />
-  </>
-);
-
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
   const router = useRouter();
   const pathName = usePathname().split("/").pop();
-  const [open, setOpen] = React.useState(false);
-  const [isUserCollapseOpen, setUserCollapseOpen] = React.useState(false);
-  const [isSchedulerCollapseOpen, setSchedulerCollapseOpen] =
-    React.useState(false);
-  const [isEvaluationCollapseOpen, setEvaluationCollapseOpen] =
-    React.useState(false);
+  const [open, setOpen] = React.useState(true);
+  const [isUserCollapseOpen, setUserCollapseOpen] = React.useState(
+    pathName === "Accounts" || pathName === "Contact"
+  );
+  const [isSchedulerCollapseOpen, setSchedulerCollapseOpen] = React.useState(
+    pathName === "Rotations" || pathName === "Conferences"
+  );
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -212,11 +124,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleUserCollapse = () => {
     setUserCollapseOpen(!isUserCollapseOpen);
   };
+
   const handleSchedulerCollapse = () => {
     setSchedulerCollapseOpen(!isSchedulerCollapseOpen);
-  };
-  const handleEvaluationCollapse = () => {
-    setEvaluationCollapseOpen(!isEvaluationCollapseOpen);
   };
 
   return (
@@ -236,12 +146,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Mini variant drawer
+            {pathName}
           </Typography>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
+        <DrawerHeader sx={{ justifyContent: "space-between" }}>
+          <Image
+            src={AdminLogo}
+            alt="Admin Logo"
+            height={40}
+            width={40}
+            style={{ marginLeft: "8px" }}
+          />
+          Admin Panel
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
               <ChevronRightIcon />
@@ -252,52 +170,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </DrawerHeader>
         <Divider />
         {/* Dashboard  */}
-        <ListItem
+        <NavigationListItem
           key={"Dashboard"}
           disablePadding
           onClick={() => router.push("/Dashboard")}
-        >
-          <ListItemButton
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? "initial" : "center",
-              px: 2.5,
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: open ? 3 : "auto",
-                justifyContent: "center",
-              }}
-            >
-              <DashboardCustomizeIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary={"Dashboard"}
-              sx={{ opacity: open ? 1 : 0 }}
-            />
-          </ListItemButton>
-        </ListItem>
+          open={open}
+          pathName={pathName ?? ""}
+          targetPath="Dashboard"
+          icon={<DashboardCustomizeIcon />}
+          primaryText="Dashboard"
+        />
         <Divider />
-
         {/* Users  */}
-        <CollapsibleSection
+        <CollapsibleListItem
           open={open}
           isCollapseOpen={isUserCollapseOpen}
-          handleCollapse={handleUserCollapse}
+          handleCollapse={() => handleUserCollapse()}
           sectionTitle={"Users"}
           subItems={["Accounts", "Contact"]}
           icons={[<AccountCircleIcon />, <ManageAccountsIcon />, <MailIcon />]}
-          active={pathName === "Users"}
-          onClick={() => router.push("/Users")}
+          active={pathName ?? ""}
+          router={router}
         />
-
         {/* Schedulers  */}
-        <CollapsibleSection
+        <CollapsibleListItem
           open={open}
           isCollapseOpen={isSchedulerCollapseOpen}
-          handleCollapse={handleSchedulerCollapse}
+          handleCollapse={() => handleSchedulerCollapse()}
           sectionTitle={"Scheduler"}
           subItems={["Rotations", "Conferences"]}
           icons={[
@@ -305,38 +204,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <WorkHistoryIcon />,
             <VideoCallIcon />,
           ]}
-          active={pathName === "Rotations" || pathName === "Conferences"}
-          onClick={() => router.push("/Scheduler")}
+          active={pathName ?? ""}
+          router={router}
         />
-
         {/* Evaluations  */}
-        <ListItem
+        <NavigationListItem
           key={"Evaluations"}
           disablePadding
           onClick={() => router.push("/Evaluations")}
-        >
-          <ListItemButton
-            sx={{
-              minHeight: 48,
-              justifyContent: open ? "initial" : "center",
-              px: 2.5,
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: open ? 3 : "auto",
-                justifyContent: "center",
-              }}
-            >
-              <QuizIcon />
-            </ListItemIcon>
-            <ListItemText
-              primary={"Evaluations"}
-              sx={{ opacity: open ? 1 : 0 }}
-            />
-          </ListItemButton>
-        </ListItem>
+          open={open}
+          pathName={pathName ?? ""}
+          targetPath="Evaluations"
+          icon={<QuizIcon />}
+          primaryText="Evaluations"
+        />
       </Drawer>
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />

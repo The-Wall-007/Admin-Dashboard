@@ -1,4 +1,4 @@
-import Layout from "@/app/Components/layout";
+import Layout from "@/components/MainLayout/layout";
 
 const RotationsPage = () => {
   return <Layout>Rotations Page</Layout>;

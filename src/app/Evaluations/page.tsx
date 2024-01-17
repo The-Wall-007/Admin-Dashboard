@@ -1,4 +1,4 @@
-import Layout from "@/app/Components/layout";
+import Layout from "@/components/MainLayout/layout";
 
 const EvaluationsPage = () => {
   return <Layout>Evaluations Page</Layout>;

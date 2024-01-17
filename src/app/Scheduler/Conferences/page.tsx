@@ -1,4 +1,4 @@
-import Layout from "@/app/Components/layout";
+import Layout from "@/components/MainLayout/layout";
 
 const ConferencesPage = () => {
   return <Layout>Conferences Page</Layout>;

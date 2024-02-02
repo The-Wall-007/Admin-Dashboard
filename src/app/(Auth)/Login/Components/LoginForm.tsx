@@ -1,33 +1,49 @@
 "use client";
 
 import React from "react";
-import { useForm, SubmitHandler, Controller } from "react-hook-form";
-import { Button, TextField, Typography, Avatar, Stack } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import {
+  Button,
+  TextField,
+  Typography,
+  Avatar,
+  Stack,
+  SxProps,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+import { firebaseConfig } from "@/api/firebase";
+import { Theme } from "@emotion/react";
 
 interface LoginFormValues {
   email: string;
   password: string;
 }
 
-const avatarStyle: React.CSSProperties = {
-  margin: "8px",
-  backgroundColor: "secondary",
-};
+initializeApp(firebaseConfig);
+const auth = getAuth();
 
-const formStyle: React.CSSProperties = {
-  width: "100%",
-  marginTop: "8px",
-};
+const signIn = async (formData: LoginFormValues) => {
+  await signInWithEmailAndPassword(auth, formData.email, formData.password)
+    .then(async (userCredential) => {
+      const user = userCredential.user;
+      const token = userCredential.user?.getIdToken();
 
-const submitButtonStyle: React.CSSProperties = {
-  margin: "24px 0 16px",
+      if (user && token) {
+        alert(JSON.stringify(await token));
+      }
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      alert(errorCode + "   " + errorMessage);
+    });
 };
 
 const LoginForm: React.FC = () => {
   const { handleSubmit, control } = useForm<LoginFormValues>();
-
-  const onSubmit = () => {};
 
   return (
     <Stack>
@@ -39,14 +55,16 @@ const LoginForm: React.FC = () => {
           justifyContent: "center",
         }}
       >
-        <Avatar style={avatarStyle}>
+        <Avatar sx={avatarStyle}>
           <LockOutlinedIcon />
         </Avatar>
+
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
       </Stack>
-      <form onSubmit={handleSubmit(onSubmit)} style={formStyle}>
+
+      <form onSubmit={handleSubmit(signIn)}>
         <Controller
           name="email"
           control={control}
@@ -63,6 +81,7 @@ const LoginForm: React.FC = () => {
             />
           )}
         />
+
         <Controller
           name="password"
           control={control}
@@ -80,12 +99,13 @@ const LoginForm: React.FC = () => {
             />
           )}
         />
+
         <Button
           type="submit"
           fullWidth
           variant="contained"
           color="primary"
-          style={submitButtonStyle}
+          sx={submitButtonStyle}
         >
           Sign In
         </Button>
@@ -95,3 +115,12 @@ const LoginForm: React.FC = () => {
 };
 
 export default LoginForm;
+
+const avatarStyle: SxProps<Theme> | undefined = {
+  margin: "8px",
+  backgroundColor: "secondary",
+};
+
+const submitButtonStyle: SxProps<Theme> | undefined = {
+  margin: "24px 0 16px",
+};

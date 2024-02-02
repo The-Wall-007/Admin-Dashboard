@@ -1,17 +1,12 @@
 import React from "react";
-import { CssBaseline, Stack } from "@mui/material";
-import LoginForm from "./Components/LoginForm";
+import { CssBaseline, Stack, SxProps } from "@mui/material";
+import { Theme } from "@emotion/react";
 
-const containerStyle: React.CSSProperties = {
-  flex: 1,
-  alignItems: "center",
-  justifyContent: "center",
-  height: "calc(100vh)",
-};
+import LoginForm from "./Components/LoginForm";
 
 const LoginPage: React.FC = async () => {
   return (
-    <Stack component="main" style={containerStyle}>
+    <Stack component="main" sx={containerStyle}>
       <CssBaseline />
       <LoginForm />
     </Stack>
@@ -19,3 +14,10 @@ const LoginPage: React.FC = async () => {
 };
 
 export default LoginPage;
+
+const containerStyle: SxProps<Theme> | undefined = {
+  flex: 1,
+  alignItems: "center",
+  justifyContent: "center",
+  height: "calc(100vh)",
+};
